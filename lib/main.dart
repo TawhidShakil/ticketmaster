@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticketmaster/pages/bottomNav.dart';
 import 'package:ticketmaster/pages/home.dart';
 
 void main() {
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Home(),
+      home: BottomNav(),
     );
   }
 }
