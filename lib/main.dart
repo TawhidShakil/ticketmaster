@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticketmaster/pages/bottomNav.dart';
 import 'package:ticketmaster/pages/home.dart';
 import 'package:ticketmaster/pages/signup.dart';
 
