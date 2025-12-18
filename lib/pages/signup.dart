@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ticketmaster/pages/home.dart';
 
 class Signup extends StatefulWidget {
   const Signup({Key? key}) : super(key: key);
@@ -8,44 +10,68 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  // 🔐 Google Sign-In Function
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleAuthProvider googleProvider = GoogleAuthProvider();
+
+      await FirebaseAuth.instance.signInWithPopup(googleProvider);
+
+      // ✅ Login success → Home page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Home()),
+      );
+    } catch (e) {
+      print("Google Sign-In Error: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Container(
-        child: Column(
-          children: [
-            Image.asset('assets/images/onboarding.png'),
-            SizedBox(height: 10),
-            Text(
-              "Unlock the features of",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+      body: Column(
+        children: [
+          Image.asset('assets/images/onboarding.png'),
+          const SizedBox(height: 10),
 
-            Text(
-              "Event Booking App",
-              style: TextStyle(
-                color: Color(0xff6351ec),
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
+          const Text(
+            "Unlock the features of",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
             ),
-            SizedBox(height: 10),
-            Text(
-              "Discover, book, and experience unforgettable movements effectlessly!",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black45, fontSize: 20),
+          ),
+
+          const Text(
+            "Event Booking App",
+            style: TextStyle(
+              color: Color(0xff6351ec),
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
             ),
-            SizedBox(height: 50),
-            Container(
+          ),
+
+          const SizedBox(height: 10),
+
+          const Text(
+            "Discover, book, and experience unforgettable movements effortlessly!",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.black45, fontSize: 20),
+          ),
+
+          const SizedBox(height: 50),
+
+          // 👇 Google Sign-In Button
+          GestureDetector(
+            onTap: signInWithGoogle, // 🔥 HERE IS THE FIX
+            child: Container(
               height: 70,
-              margin: EdgeInsets.only(left: 30, right: 30),
+              margin: const EdgeInsets.symmetric(horizontal: 30),
               decoration: BoxDecoration(
-                color: Color(0xff6351ec),
+                color: const Color(0xff6351ec),
                 borderRadius: BorderRadius.circular(45),
               ),
               child: Row(
@@ -55,12 +81,10 @@ class _SignupState extends State<Signup> {
                     'assets/images/google.png',
                     height: 30,
                     width: 30,
-                    fit: BoxFit.cover,
                   ),
-                  SizedBox(width: 20),
-                  Text(
+                  const SizedBox(width: 20),
+                  const Text(
                     "Sign in with Google",
-                    textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -70,8 +94,8 @@ class _SignupState extends State<Signup> {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
