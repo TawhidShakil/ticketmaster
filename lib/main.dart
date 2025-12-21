@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ticketmaster/pages/bottomNav.dart';
+import 'package:ticketmaster/pages/deatil_page.dart';
 import 'package:ticketmaster/pages/home.dart';
 import 'package:ticketmaster/pages/signup.dart';
 
@@ -41,7 +42,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Signup(),
+      home: DeatilPage(),
     );
   }
 }
