@@ -33,7 +33,7 @@ class _SignupState extends State<Signup> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          Image.asset('assets/images/onboarding.png'),
+          Image.asset('images/onboarding.png'),
           const SizedBox(height: 10),
 
           const Text(
@@ -77,11 +77,7 @@ class _SignupState extends State<Signup> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/images/google.png',
-                    height: 30,
-                    width: 30,
-                  ),
+                  Image.asset('images/google.png', height: 30, width: 30),
                   const SizedBox(width: 20),
                   const Text(
                     "Sign in with Google",

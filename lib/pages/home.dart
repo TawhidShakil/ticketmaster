@@ -95,7 +95,7 @@ class _HomeState extends State<Home> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
-                              "images/musical-note.png",
+                              "images/musical.png",
                               height: 30,
                               width: 30,
                               fit: BoxFit.cover,
@@ -250,7 +250,7 @@ class _HomeState extends State<Home> {
               child: Stack(
                 children: [
                   Image.asset(
-                    "images/event1.jpg",
+                    "images/event.jpg",
                     height: 200,
                     width: MediaQuery.of(context).size.width,
                     fit: BoxFit.cover,
