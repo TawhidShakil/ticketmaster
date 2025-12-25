@@ -3,6 +3,7 @@ import 'package:ticketmaster/pages/booking.dart';
 import 'package:ticketmaster/pages/bottomNav.dart';
 import 'package:ticketmaster/pages/deatil_page.dart';
 import 'package:ticketmaster/pages/home.dart';
+import 'package:ticketmaster/pages/profile.dart';
 import 'package:ticketmaster/pages/signup.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Booking(),
+      home: Profile(),
     );
   }
 }
