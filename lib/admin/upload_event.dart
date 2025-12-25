@@ -1,13 +1,18 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/foundation.dart';
 
 class UploadEvent extends StatefulWidget {
   const UploadEvent({super.key});
 
   @override
-  State<UploadEvent> createState() => _MyWidgetState();
+  State<UploadEvent> createState() => _UploadEventState();
 }
 
-class _MyWidgetState extends State<UploadEvent> {
+class _UploadEventState extends State<UploadEvent> {
+  // category list
   List<String> eventcategory = [
     "Seminar",
     "Workshop",
@@ -17,25 +22,111 @@ class _MyWidgetState extends State<UploadEvent> {
 
   String? selectedEventType;
 
+  // controllers
+  final TextEditingController eventNameController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
+  final TextEditingController detailsController = TextEditingController();
+
+  XFile? imageFile;
+  bool isUploading = false;
+
+  /// pick image
+  Future<void> pickImage() async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      setState(() => imageFile = image);
+    }
+  }
+
+  /// 🔥 one button upload (image + data)
+  Future<void> uploadEvent() async {
+    if (imageFile == null ||
+        eventNameController.text.isEmpty ||
+        priceController.text.isEmpty ||
+        detailsController.text.isEmpty ||
+        selectedEventType == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('All fields are required')));
+      return;
+    }
+
+    setState(() => isUploading = true);
+
+    try {
+      // 1️⃣ upload image
+      final ext = imageFile!.name.split('.').last;
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.$ext';
+      final bytes = await imageFile!.readAsBytes();
+
+      print('Uploading image: $fileName');
+      await Supabase.instance.client.storage
+          .from('images')
+          .uploadBinary(fileName, bytes);
+
+      print('Image uploaded successfully');
+
+      // 2️⃣ get image url
+      final imageUrl = Supabase.instance.client.storage
+          .from('images')
+          .getPublicUrl(fileName);
+
+      print('Image URL: $imageUrl');
+
+      // 3️⃣ insert data
+      final price = int.tryParse(priceController.text.trim()) ?? 0;
+
+      print('Inserting event data...');
+      await Supabase.instance.client.from('ticket_events').insert({
+        'event_name': eventNameController.text.trim(),
+        'price': price,
+        'category': selectedEventType,
+        'details': detailsController.text.trim(),
+        'image_url': imageUrl,
+      });
+
+      print('Event data inserted successfully');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Event uploaded successfully')),
+      );
+
+      // clear
+      eventNameController.clear();
+      priceController.clear();
+      detailsController.clear();
+      setState(() {
+        imageFile = null;
+        selectedEventType = null;
+      });
+    } catch (e) {
+      print('Error uploading event: $e'); // Print detailed error to console
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+    } finally {
+      setState(() => isUploading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        margin: EdgeInsets.only(top: 40.0, left: 20, right: 20, bottom: 40),
-
+        margin: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            /// header
             Row(
               children: [
                 GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(Icons.arrow_back_ios_new_outlined),
+                  onTap: () => Navigator.pop(context),
+                  child: const Icon(Icons.arrow_back_ios_new_outlined),
                 ),
-                // SizedBox(width: MediaQuery.of(context).size.width / 5.5),
-                Expanded(
+                const Expanded(
                   child: Center(
                     child: Text(
                       "Upload Event",
@@ -49,164 +140,150 @@ class _MyWidgetState extends State<UploadEvent> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+
+            const SizedBox(height: 20),
+
+            /// image box
             Center(
-              child: Builder(
-                builder: (context) {
-                  return Container(
-                    height: 150,
-                    width: 150,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black45, width: 2.0),
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: Icon(Icons.camera_alt_outlined),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 20.0),
-            Text(
-              "Event Name",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 10),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: Color(0xffececf8),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextField(
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Enter Event Name",
-                  hintStyle: TextStyle(color: Colors.black45, fontSize: 16),
+              child: GestureDetector(
+                onTap: pickImage,
+                child: Container(
+                  height: 150,
+                  width: 150,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black45, width: 2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: imageFile == null
+                      ? const Icon(Icons.camera_alt_outlined, size: 40)
+                      : kIsWeb
+                      ? Image.network(imageFile!.path, fit: BoxFit.cover)
+                      : Image.file(File(imageFile!.path), fit: BoxFit.cover),
                 ),
               ),
             ),
 
-            SizedBox(height: 30.0),
-            Text(
+            const SizedBox(height: 20),
+
+            /// Event name
+            const Text(
+              "Event Name",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 10),
+            _inputField("Enter Event Name", eventNameController),
+
+            const SizedBox(height: 30),
+
+            /// Ticket price
+            const Text(
               "Ticket Price",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
             ),
-            SizedBox(height: 10),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: Color(0xffececf8),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextField(
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Enter Price",
-                  hintStyle: TextStyle(color: Colors.black45, fontSize: 16),
-                ),
-              ),
+            const SizedBox(height: 10),
+            _inputField(
+              "Enter Price",
+              priceController,
+              keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 30.0),
-            Text(
+
+            const SizedBox(height: 30),
+
+            /// Category
+            const Text(
               "Select Category",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
-                color: Color(0xffececf8),
+                color: const Color(0xffececf8),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: DropdownButton<String>(
+                isExpanded: true,
+                underline: Container(),
+                hint: const Text("Select Category"),
+                value: selectedEventType,
                 items: eventcategory
                     .map(
-                      (item) => DropdownMenuItem(
-                        value: item,
-                        child: Text(
-                          item,
-                          style: TextStyle(fontSize: 18, color: Colors.black),
-                        ),
-                      ),
+                      (item) =>
+                          DropdownMenuItem(value: item, child: Text(item)),
                     )
                     .toList(),
                 onChanged: (value) {
-                  setState(() {
-                    selectedEventType = value;
-                  });
+                  setState(() => selectedEventType = value);
                 },
-                dropdownColor: Colors.white,
-                hint: Text("Select Category"),
-                icon: Icon(Icons.arrow_drop_down),
-                iconSize: 36,
-                value: selectedEventType,
-                underline: Container(),
               ),
             ),
-            SizedBox(height: 20.0),
-            Text(
+
+            const SizedBox(height: 20),
+
+            /// Details
+            const Text(
               "Event Details",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
             ),
-            SizedBox(height: 10),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: Color(0xffececf8),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextField(
-                maxLines: 6,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "What will be on the event .....",
-                  hintStyle: TextStyle(color: Colors.black45, fontSize: 16),
-                ),
-              ),
+            const SizedBox(height: 10),
+            _inputField(
+              "What will be on the event .....",
+              detailsController,
+              maxLines: 6,
             ),
-            SizedBox(height: 20.0),
+
+            const SizedBox(height: 25),
+
+            /// Upload button
             Center(
-              child:  Container(
-              decoration: BoxDecoration(
-                color: Color(0xff6351ec),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              width: 200,
-              height: 50,
-              child: Center(
-                child: Text(
-                  "Upload",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+              child: GestureDetector(
+                onTap: isUploading ? null : uploadEvent,
+                child: Container(
+                  width: 200,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: const Color(0xff6351ec),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: isUploading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            "Upload",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
-              )
+              ),
             ),
-            )
           ],
         ),
+      ),
+    );
+  }
+
+  /// reusable input field
+  Widget _inputField(
+    String hint,
+    TextEditingController controller, {
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: const Color(0xffececf8),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(border: InputBorder.none, hintText: hint),
       ),
     );
   }
