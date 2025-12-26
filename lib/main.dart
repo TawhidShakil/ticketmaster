@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ticketmaster/admin/upload_event.dart';
 import 'package:ticketmaster/pages/booking.dart';
 import 'package:ticketmaster/pages/bottomNav.dart';
-import 'package:ticketmaster/pages/deatil_page.dart';
+import 'package:ticketmaster/pages/details_page.dart';
 import 'package:ticketmaster/pages/home.dart';
 import 'package:ticketmaster/pages/profile.dart';
 import 'package:ticketmaster/pages/signup.dart';
@@ -17,9 +17,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 🔹 Firebase (unchanged)
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // 🔹 Supabase (JUST ADDED)
   await Supabase.initialize(
@@ -41,7 +39,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: UploadEvent(), // unchanged
+      home: BottomNav(), // unchanged
     );
   }
 }
