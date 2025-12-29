@@ -1,0 +1,74 @@
+import 'package:flutter/material.dart';
+
+class AdminHome extends StatelessWidget {
+  const AdminHome({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xffeef0ff),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+
+            const Text(
+              "Home Admin",
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 40),
+
+            _adminCard(context, icon: Icons.upload, title: "Upload\nEvents"),
+
+            const SizedBox(height: 25),
+
+            _adminCard(
+              context,
+              icon: Icons.confirmation_num,
+              title: "Event\nTickets",
+            ),
+
+            const SizedBox(height: 25),
+
+            _adminCard(
+              context,
+              icon: Icons.manage_accounts,
+              title: "Manage\nProfiles",
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _adminCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+  }) {
+    return Center(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.75, // 🔹 reduced width
+        padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade400),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: Colors.purple),
+            const SizedBox(width: 20),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
