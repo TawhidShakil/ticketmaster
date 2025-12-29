@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ticketmaster/pages/bottomNav.dart';
 import 'package:ticketmaster/pages/home.dart';
 import '../admin/admin_login.dart';
+import 'package:flutter/foundation.dart';
 
 class Signup extends StatefulWidget {
   const Signup({Key? key}) : super(key: key);
@@ -15,17 +16,20 @@ class _SignupState extends State<Signup> {
   // 🔐 Google Sign-In Function
   Future<void> signInWithGoogle() async {
     try {
-      final GoogleAuthProvider googleProvider = GoogleAuthProvider();
+      final googleProvider = GoogleAuthProvider();
 
-      await FirebaseAuth.instance.signInWithPopup(googleProvider);
+      if (kIsWeb) {
+        await FirebaseAuth.instance.signInWithPopup(googleProvider);
+      } else {
+        await FirebaseAuth.instance.signInWithProvider(googleProvider);
+      }
 
-      // ✅ Login success → Home page
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => BottomNav()),
+        MaterialPageRoute(builder: (context) => const BottomNav()),
       );
     } catch (e) {
-      print("Google Sign-In Error: $e");
+      debugPrint("Google Sign-In Error: $e");
     }
   }
 
