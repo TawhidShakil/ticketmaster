@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'upload_event.dart';
+import 'update_event.dart';
 
 class AdminHome extends StatelessWidget {
   const AdminHome({super.key});
@@ -28,6 +29,19 @@ class AdminHome extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const UploadEvent()),
+                );
+              },
+            ),
+
+            const SizedBox(height: 25),
+            _adminCard(
+              context,
+              icon: Icons.edit,
+              title: "Update\nEvents",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const UpdateEvent()),
                 );
               },
             ),
