@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ticketmaster/pages/bottomNav.dart';
 import 'package:ticketmaster/pages/home.dart';
 import '../admin/admin_login.dart';
 
@@ -21,7 +22,7 @@ class _SignupState extends State<Signup> {
       // ✅ Login success → Home page
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Home()),
+        MaterialPageRoute(builder: (context) => BottomNav()),
       );
     } catch (e) {
       print("Google Sign-In Error: $e");
@@ -103,7 +104,7 @@ class _SignupState extends State<Signup> {
                 MaterialPageRoute(builder: (context) => const AdminLogin()),
               );
             },
-            child: Text(
+            child: const Text(
               "Login as an Admin",
               style: TextStyle(
                 color: Color.fromARGB(255, 3, 3, 3),
@@ -113,6 +114,8 @@ class _SignupState extends State<Signup> {
               ),
             ),
           ),
+
+          const SizedBox(height: 10),
         ],
       ),
     );
