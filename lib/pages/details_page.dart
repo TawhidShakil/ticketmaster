@@ -1,27 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DeatilPage extends StatefulWidget {
-  const DeatilPage({super.key});
+  final Map<String, dynamic> event;
+  const DeatilPage({super.key, required this.event});
 
   @override
   State<DeatilPage> createState() => _DeatilPageState();
 }
 
 class _DeatilPageState extends State<DeatilPage> {
+  int ticketCount = 1;
+
   @override
   Widget build(BuildContext context) {
+    // Calculate total amount based on dynamic price
+    final int price = widget.event['price'] ?? 0;
+    final int totalAmount = price * ticketCount;
+
     return Scaffold(
-      body: Container(
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
-                Image.asset(
-                  "images/event.jpg",
+                Image.network(
+                  widget.event['image_url'] ?? "",
                   height: MediaQuery.of(context).size.height / 2,
                   width: MediaQuery.of(context).size.width,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: MediaQuery.of(context).size.height / 2,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.broken_image, size: 50),
+                  ),
                 ),
                 Container(
                   height: MediaQuery.of(context).size.height / 2,
@@ -35,71 +48,56 @@ class _DeatilPageState extends State<DeatilPage> {
                           Navigator.pop(context);
                         },
                         child: Container(
-                          padding: EdgeInsets.all(8),
-                          margin: EdgeInsets.only(top: 40.0, left: 20.0),
+                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.only(top: 40.0, left: 20.0),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(30),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.arrow_back_ios_new_outlined,
                             color: Colors.black,
                           ),
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.only(left: 20.0),
+                        padding: const EdgeInsets.only(
+                          left: 20.0,
+                          bottom: 20.0,
+                        ),
                         width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(color: Colors.black45),
+                        decoration: const BoxDecoration(color: Colors.black45),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            if (widget.event['category'] != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xff6351ec),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Text(
+                                  widget.event['category'].toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: 5),
                             Text(
-                              "Islamic Seminar",
-                              style: TextStyle(
+                              widget.event['event_name'] ?? 'Unnamed Event',
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 25.0,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Row(
-                              children: [
-                                Icon(Icons.calendar_month, color: Colors.white),
-                                SizedBox(width: 5.0),
-                                Text(
-                                  "25 Dec 2025",
-                                  style: TextStyle(
-                                    color: const Color.fromRGBO(
-                                      211,
-                                      255,
-                                      255,
-                                      255,
-                                    ),
-                                    fontSize: 18.0,
-                                  ),
-                                ),
-                                SizedBox(width: 10.0),
-                                Icon(
-                                  Icons.location_on_outlined,
-                                  color: Colors.white,
-                                ),
-
-                                SizedBox(width: 10.0),
-                                Text(
-                                  "Rose View Hotel \nUposhohor",
-                                  style: TextStyle(
-                                    color: const Color.fromRGBO(
-                                      211,
-                                      255,
-                                      255,
-                                      255,
-                                    ),
-                                    fontSize: 18.0,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 20.0),
                           ],
                         ),
                       ),
@@ -108,9 +106,9 @@ class _DeatilPageState extends State<DeatilPage> {
                 ),
               ],
             ),
-            SizedBox(height: 20.0),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0),
+            const SizedBox(height: 20.0),
+            const Padding(
+              padding: EdgeInsets.only(left: 20.0),
               child: Text(
                 "About Event",
                 style: TextStyle(
@@ -120,24 +118,25 @@ class _DeatilPageState extends State<DeatilPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 10.0),
             Padding(
-              padding: const EdgeInsets.only(left: 20.0),
+              padding: const EdgeInsets.only(left: 20.0, right: 20.0),
               child: Text(
-                "Laboris nisi tempor proident voluptate. Ea culpa mollit ut fugiat aute occaecat mollit consectetur nulla nulla sit ea ex velit. Nostrud et pariatur minim voluptate laborum. Lorem reprehenderit deserunt reprehenderit ipsum enim aute.",
-                style: TextStyle(
+                widget.event['details'] ??
+                    "No details provided for this event.",
+                style: const TextStyle(
                   color: Colors.black87,
                   fontSize: 18.0,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
-            SizedBox(height: 10.0),
+            const SizedBox(height: 20.0),
             Padding(
-              padding: const EdgeInsets.only(left: 20.0, right: 30.0),
+              padding: const EdgeInsets.only(left: 20.0, right: 20.0),
               child: Row(
                 children: [
-                  Text(
+                  const Text(
                     "Number of Tickets: ",
                     style: TextStyle(
                       color: Colors.black,
@@ -145,29 +144,51 @@ class _DeatilPageState extends State<DeatilPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(width: 40.0),
+                  const Spacer(),
                   Container(
-                    width: 50,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.black54, width: 2.0),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Column(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          "+",
-                          style: TextStyle(color: Colors.black, fontSize: 25.0),
-                        ),
-                        Text(
-                          "3",
-                          style: TextStyle(
-                            color: Color(0xff6351ec),
-                            fontSize: 25.0,
+                        GestureDetector(
+                          onTap: () {
+                            if (ticketCount > 1) {
+                              setState(() => ticketCount--);
+                            }
+                          },
+                          child: const Text(
+                            "-",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 30.0,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 15),
                         Text(
-                          "-",
-                          style: TextStyle(color: Colors.black, fontSize: 25.0),
+                          "$ticketCount",
+                          style: const TextStyle(
+                            color: Color(0xff6351ec),
+                            fontSize: 25.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() => ticketCount++);
+                          },
+                          child: const Text(
+                            "+",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 25.0,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -175,31 +196,39 @@ class _DeatilPageState extends State<DeatilPage> {
                 ],
               ),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 30.0),
             Padding(
-              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+              padding: const EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                bottom: 30.0,
+              ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Amount : ৳1500",
-                    style: TextStyle(
+                    "Total: ৳$totalAmount",
+                    style: const TextStyle(
                       color: Color(0xff6351ec),
                       fontSize: 23.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(width: 20.0),
                   Container(
-                    width: 200,
-                    height: 50,
+                    width: 180,
+                    height: 55,
                     decoration: BoxDecoration(
-                      color: Color(0xff6351ec),
-                      borderRadius: BorderRadius.circular(10),
+                      color: const Color(0xff6351ec),
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Text(
                         "Book Now",
-                        style: TextStyle(color: Colors.white, fontSize: 25.0),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),

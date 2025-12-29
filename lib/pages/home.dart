@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ticketmaster/pages/details_page.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -187,7 +188,7 @@ class _HomeState extends State<Home> {
                               ],
                             ),
 
-                            // 🔹 Location 
+                            // 🔹 Location
                             Row(
                               children: [
                                 const Icon(
@@ -199,6 +200,28 @@ class _HomeState extends State<Home> {
                                   event['location'] ??
                                       'No Location', // Fixed key
                                   style: const TextStyle(fontSize: 18),
+                                ),
+                                const Spacer(),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            DeatilPage(event: event),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xff6351ec),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Book Now",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
                               ],
                             ),
