@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'upload_event.dart';
 
 class AdminHome extends StatelessWidget {
   const AdminHome({super.key});
@@ -19,7 +20,17 @@ class AdminHome extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            _adminCard(context, icon: Icons.upload, title: "Upload\nEvents"),
+            _adminCard(
+              context,
+              icon: Icons.upload,
+              title: "Upload\nEvents",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const UploadEvent()),
+                );
+              },
+            ),
 
             const SizedBox(height: 25),
 
@@ -46,27 +57,34 @@ class AdminHome extends StatelessWidget {
     BuildContext context, {
     required IconData icon,
     required String title,
+    VoidCallback? onTap,
   }) {
     return Center(
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.75, // 🔹 reduced width
-        padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade400),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Colors.purple),
-            const SizedBox(width: 20),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-          ],
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.75, // 🔹 reduced width
+          padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade400),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 40, color: Colors.purple),
+              const SizedBox(width: 20),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

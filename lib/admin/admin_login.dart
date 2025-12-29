@@ -11,7 +11,7 @@ class AdminLogin extends StatefulWidget {
 class _AdminLoginState extends State<AdminLogin> {
   // 🔐 Hardcoded admin credentials
   final String adminUsername = "admin";
-  final String adminPassword = "123456";
+  final String adminPassword = "123";
 
   // Controllers
   final TextEditingController usernameController = TextEditingController();
@@ -50,7 +50,7 @@ class _AdminLoginState extends State<AdminLogin> {
                 height: 260,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage("assets/image/onboarding.png"),
+                    image: AssetImage("images/onboarding.png"),
                     fit: BoxFit.contain,
                   ),
                 ),

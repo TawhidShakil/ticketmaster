@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ticketmaster/pages/home.dart';
+import '../admin/admin_login.dart';
 
 class Signup extends StatefulWidget {
   const Signup({Key? key}) : super(key: key);
@@ -88,6 +89,27 @@ class _SignupState extends State<Signup> {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // 🔹 Admin Login Button
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AdminLogin()),
+              );
+            },
+            child: Text(
+              "Login as an Admin",
+              style: TextStyle(
+                color: Color.fromARGB(255, 3, 3, 3),
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                decoration: TextDecoration.underline,
               ),
             ),
           ),
