@@ -95,13 +95,42 @@ class _ProfileState extends State<Profile> {
                       _actionItem("Contact Us", Icons.mail_outline, () {}),
                       const SizedBox(height: 15),
                       _actionItem("LogOut", Icons.logout, () async {
-                        await FirebaseAuth.instance.signOut();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Signup(),
-                          ),
+                        bool? confirm = await showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text("Confirm Logout"),
+                              content: const Text(
+                                "Are you sure you want to logout?",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, false); // NO
+                                  },
+                                  child: const Text("Cancel"),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, true); // YES
+                                  },
+                                  child: const Text("Logout"),
+                                ),
+                              ],
+                            );
+                          },
                         );
+
+                        if (confirm == true) {
+                          await FirebaseAuth.instance.signOut();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Signup(),
+                            ),
+                          );
+                        }
                       }),
                       const SizedBox(height: 15),
                       _actionItem(
