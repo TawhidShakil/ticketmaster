@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ticketmaster/admin/admin_login.dart';
+import 'package:ticketmaster/admin/home_admin.dart';
 import 'package:ticketmaster/admin/upload_event.dart';
 import 'package:ticketmaster/pages/booking.dart';
 import 'package:ticketmaster/pages/bottomNav.dart';
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Signup(), // unchanged
+      home: AdminLogin(), // unchanged
     );
   }
 }
