@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "170673081044",
+    "project_id": "ticket-master-542ef",
+    "storage_bucket": "ticket-master-542ef.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:170673081044:android:4ea11b216e73321c6a4941",
+        "android_client_info": {
+          "package_name": "com.example.ticketmaster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "170673081044-9jd96jnken2o24cgp5t8p706mbeme9vj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDys29LNAv0srCoTht9IJ3ONGbHWjmm3CY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "170673081044-9jd96jnken2o24cgp5t8p706mbeme9vj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
