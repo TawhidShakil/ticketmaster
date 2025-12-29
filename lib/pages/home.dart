@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ticketmaster/pages/details_page.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,6 +12,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final supabase = Supabase.instance.client;
+  auth.User? user;
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -20,6 +22,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    user = auth.FirebaseAuth.instance.currentUser;
     fetchEvents();
     _searchController.addListener(_onSearchChanged);
   }
@@ -74,21 +77,14 @@ class _HomeState extends State<Home> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: const [
-                  Icon(Icons.location_on_outlined),
-                  Text(
-                    "Balucor, Sylhet",
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-
               const SizedBox(height: 10),
 
-              const Text(
-                "Hello, Fardeen",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              Text(
+                "Hello, ${user?.displayName?.split(' ')[0] ?? "Fardeen"}",
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               const SizedBox(height: 10),
