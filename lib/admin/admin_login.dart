@@ -22,13 +22,12 @@ class _AdminLoginState extends State<AdminLogin> {
   void _login() {
     if (usernameController.text == adminUsername &&
         passwordController.text == adminPassword) {
-      // ✅ Login success → go to Admin Home
+      //  Login success → go to Admin Home
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const AdminHome()),
       );
     } else {
-      // ❌ Login failed
       setState(() {
         errorMessage = "Invalid username or password";
       });

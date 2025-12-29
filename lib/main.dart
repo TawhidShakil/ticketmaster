@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Home(), // unchanged
+      home: AdminLogin(), // unchanged
     );
   }
 }
