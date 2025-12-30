@@ -96,6 +96,12 @@ class _DeleteEventState extends State<DeleteEvent> {
     try {
       debugPrint('Attempting to delete event with ID: $eventId');
 
+      // 1. Delete associated bookings first to avoid foreign key constraint error
+      await supabase.from('bookings').delete().eq('event_id', eventId);
+
+      debugPrint('Associated bookings deleted successfully (if any)');
+
+      // 2. Now delete the event
       final response = await supabase
           .from('ticket_events')
           .delete()
@@ -108,7 +114,7 @@ class _DeleteEventState extends State<DeleteEvent> {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('$eventName deleted successfully'),
+            content: Text('$eventName and its bookings deleted successfully'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),
@@ -119,14 +125,14 @@ class _DeleteEventState extends State<DeleteEvent> {
       await fetchEvents();
     } catch (e) {
       debugPrint('❌ Error deleting event: $e');
-      debugPrint('Error type: ${e.runtimeType}');
 
       String errorMessage = 'Error deleting event';
 
-      if (e.toString().contains('policy')) {
+      if (e.toString().contains('violates foreign key constraint')) {
+        errorMessage =
+            'Could not delete: This event has active references in other tables.';
+      } else if (e.toString().contains('policy')) {
         errorMessage = 'Permission denied. Please check Supabase RLS policies.';
-      } else if (e.toString().contains('JWT')) {
-        errorMessage = 'Authentication error. Please login again.';
       } else {
         errorMessage = 'Error: ${e.toString()}';
       }

@@ -4,16 +4,16 @@ import 'package:ticketmaster/pages/signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-// ADD THIS
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🔹 Firebase (unchanged)
+  
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // 🔹 Supabase (JUST ADDED)
+  
   await Supabase.initialize(
     url: 'https://mjgnflcnotxvnttoatrf.supabase.co',
     anonKey: 'sb_publishable_VPgbTPuLDl8jP66DNwy2oQ_Wd-zUldx',
