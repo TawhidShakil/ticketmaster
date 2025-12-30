@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'upload_event.dart';
 import 'update_event.dart';
-import 'admin_logout.dart'; // ✅ Import the logout file
+import 'admin_logout.dart';
+import 'delete_event.dart';
 
 class AdminHome extends StatelessWidget {
   const AdminHome({super.key});
@@ -65,6 +66,20 @@ class AdminHome extends StatelessWidget {
             const SizedBox(height: 25),
 
             // Event Tickets Card
+            _adminCard(
+              context,
+              icon: Icons.delete,
+              title: "Delete\nEvents",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DeleteEvent()),
+                );
+              },
+            ),
+
+            const SizedBox(height: 25),
+
             _adminCard(
               context,
               icon: Icons.confirmation_num,
