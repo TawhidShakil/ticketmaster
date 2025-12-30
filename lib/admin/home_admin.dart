@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'upload_event.dart';
 import 'update_event.dart';
+import 'admin_logout.dart'; // ✅ Import the logout file
 
 class AdminHome extends StatelessWidget {
   const AdminHome({super.key});
@@ -14,13 +15,26 @@ class AdminHome extends StatelessWidget {
           children: [
             const SizedBox(height: 20),
 
-            const Text(
-              "Home Admin",
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            // Header with logout button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 40), // Spacer for centering
+                  const Text(
+                    "Home Admin",
+                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                  ),
+                  // ✅ Logout Icon Button from admin_logout.dart
+                  AdminLogout.logoutIconButton(context),
+                ],
+              ),
             ),
 
             const SizedBox(height: 40),
 
+            // Upload Events Card
             _adminCard(
               context,
               icon: Icons.upload,
@@ -34,6 +48,8 @@ class AdminHome extends StatelessWidget {
             ),
 
             const SizedBox(height: 25),
+
+            // Update Events Card
             _adminCard(
               context,
               icon: Icons.edit,
@@ -48,6 +64,7 @@ class AdminHome extends StatelessWidget {
 
             const SizedBox(height: 25),
 
+            // Event Tickets Card
             _adminCard(
               context,
               icon: Icons.confirmation_num,
@@ -56,11 +73,17 @@ class AdminHome extends StatelessWidget {
 
             const SizedBox(height: 25),
 
+            // Manage Profiles Card
             _adminCard(
               context,
               icon: Icons.manage_accounts,
               title: "Manage\nProfiles",
             ),
+
+            const Spacer(),
+
+            // ✅ Bottom Logout Button from admin_logout.dart
+            AdminLogout.logoutButton(context),
           ],
         ),
       ),
@@ -77,7 +100,7 @@ class AdminHome extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          width: MediaQuery.of(context).size.width * 0.75, // 🔹 reduced width
+          width: MediaQuery.of(context).size.width * 0.75,
           padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 20),
           decoration: BoxDecoration(
             color: Colors.white,
