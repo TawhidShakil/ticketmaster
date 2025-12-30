@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
+
 import 'package:ticketmaster/pages/booking.dart';
 import 'package:ticketmaster/pages/bottomNav.dart';
 import 'package:ticketmaster/pages/deatil_page.dart';
 import 'package:ticketmaster/pages/home.dart';
+
 import 'package:ticketmaster/pages/signup.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  
+  await Supabase.initialize(
+    url: 'https://mjgnflcnotxvnttoatrf.supabase.co',
+    anonKey: 'sb_publishable_VPgbTPuLDl8jP66DNwy2oQ_Wd-zUldx',
+  );
 
   runApp(const MyApp());
 }
@@ -19,13 +31,13 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         // This is the theme of your application.
         //
         // TRY THIS: Try running your application with "flutter run". You'll see
@@ -130,6 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
+      home: Signup(), // unchanged
     );
   }
 }

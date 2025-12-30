@@ -27,10 +27,16 @@ android {
         applicationId = "com.example.ticketmaster"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        
+        // ✅ CHANGED: Set minSdk to 21 for SSLCommerz
+        minSdk = flutter.minSdkVersion  // Changed from flutter.minSdkVersion
+        
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        // ✅ ADDED: Enable MultiDex for SSLCommerz
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -44,4 +50,9 @@ android {
 
 flutter {
     source = "../.."
+}
+
+// ✅ ADDED: MultiDex dependency
+dependencies {
+    implementation("androidx.multidex:multidex:2.0.1")
 }

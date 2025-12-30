@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ticketmaster/pages/details_page.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -8,317 +11,220 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final supabase = Supabase.instance.client;
+  auth.User? user;
+
+  final TextEditingController _searchController = TextEditingController();
+
+  List<dynamic> _allEvents = [];
+  List<dynamic> _filteredEvents = [];
+
+  @override
+  void initState() {
+    super.initState();
+    user = auth.FirebaseAuth.instance.currentUser;
+    fetchEvents();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  Future<void> fetchEvents() async {
+    final data = await supabase
+        .from('ticket_events')
+        .select()
+        .order('id', ascending: false);
+
+    setState(() {
+      _allEvents = data;
+      _filteredEvents = data; // initially show all
+    });
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text.toLowerCase();
+
+    setState(() {
+      if (query.isEmpty) {
+        _filteredEvents = _allEvents;
+      } else {
+        _filteredEvents = _allEvents.where((event) {
+          final name = (event['event_name'] ?? '').toString().toLowerCase();
+          return name.startsWith(query);
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.only(top: 50.0, left: 20.0),
+        padding: const EdgeInsets.only(top: 50, left: 20),
         width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xffe3e6ff), Color(0xfff1f3ff), Colors.white],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.location_on_outlined),
-                Text(
-                  "Balucor, Sylhet",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.w500,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 10),
+
+              Text(
+                "Hello, ${user?.displayName?.split(' ')[0] ?? "Fardeen"}",
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              const Text(
+                "Events around your location",
+                style: TextStyle(
+                  color: Color(0xff6351ec),
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // ================= SEARCH =================
+              Container(
+                margin: const EdgeInsets.only(right: 20),
+                padding: const EdgeInsets.only(left: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: const InputDecoration(
+                    suffixIcon: Icon(Icons.search_outlined),
+                    border: InputBorder.none,
+                    hintText: "Search an Event",
                   ),
                 ),
-              ],
-            ),
-            SizedBox(height: 10.0),
-            Text(
-              "Hello, Fardeen",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 30.0,
-                fontWeight: FontWeight.bold,
               ),
-            ),
-            SizedBox(height: 10.0),
-            Text(
-              "There are 20 events \naround your location",
-              style: TextStyle(
-                color: Color(0xff6351ec),
-                fontSize: 25.0,
-                fontWeight: FontWeight.bold,
+
+              const SizedBox(height: 25),
+
+              // ================= EVENTS =================
+              const Text(
+                "Upcoming Events",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-            ),
-            SizedBox(height: 20.0),
-            Container(
-              margin: EdgeInsets.only(right: 20.0),
-              padding: EdgeInsets.only(left: 20.0),
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextField(
-                decoration: InputDecoration(
-                  suffixIcon: Icon(Icons.search_outlined),
-                  border: InputBorder.none,
-                  hintText: "Search an Event",
-                ),
-              ),
-            ),
-            // Event categories
-            SizedBox(height: 20.0),
-            Container(
-              height: 100,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(bottom: 6.0),
-                    child: Material(
-                      elevation: 3.0,
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        width: 130,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              "images/musical.png",
-                              height: 30,
-                              width: 30,
-                              fit: BoxFit.cover,
-                            ),
-                            Text(
-                              "Music",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20.0,
+
+              const SizedBox(height: 20),
+
+              _filteredEvents.isEmpty
+                  ? const Text("No events found")
+                  : ListView.builder(
+                      itemCount: _filteredEvents.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final event = _filteredEvents[index];
+                        final imageUrl = event['image_url'] ?? '';
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 20, right: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Image.network(
+                                  imageUrl,
+                                  height: 200,
+                                  width: MediaQuery.of(context).size.width,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Container(
+                                        height: 200,
+                                        color: Colors.grey[300],
+                                        child: const Icon(
+                                          Icons.broken_image,
+                                          size: 50,
+                                        ),
+                                      ),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 30.0),
-                  Container(
-                    margin: EdgeInsets.only(bottom: 6.0),
-                    child: Material(
-                      elevation: 3.0,
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        width: 130,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              "images/tshirt.png",
-                              height: 30,
-                              width: 30,
-                              fit: BoxFit.cover,
-                            ),
-                            Text(
-                              "Clothing",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20.0,
+
+                              const SizedBox(height: 6),
+
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    event['event_name'] ?? 'Unnamed Event',
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    "${event['price'] ?? 0} BDT",
+                                    style: const TextStyle(
+                                      color: Color(0xff6351ec),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 30.0),
-                  Container(
-                    margin: EdgeInsets.only(bottom: 6.0),
-                    child: Material(
-                      elevation: 3.0,
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        width: 130,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              "images/confetti.png",
-                              height: 30,
-                              width: 30,
-                              fit: BoxFit.cover,
-                            ),
-                            Text(
-                              "Festival",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20.0,
+
+                              Row(
+                                children: [
+                                  const Icon(Icons.location_on, size: 18),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    event['location'] ?? 'No Location',
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                  const Spacer(),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DeatilPage(event: event),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xff6351ec),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      "Book Now",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                  SizedBox(width: 30.0),
-                  Container(
-                    margin: EdgeInsets.only(bottom: 6.0),
-                    child: Material(
-                      elevation: 3.0,
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        width: 130,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              "images/dish.png",
-                              height: 30,
-                              width: 30,
-                              fit: BoxFit.cover,
-                            ),
-                            Text(
-                              "Food",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20.0,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Upcomming Events",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
-                  child: Text(
-                    "See all",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20.0),
-            Container(
-              margin: EdgeInsets.only(right: 20.0),
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(),
-              child: Stack(
-                children: [
-                  Image.asset(
-                    "images/event.jpg",
-                    height: 200,
-                    width: MediaQuery.of(context).size.width,
-                    fit: BoxFit.cover,
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(left: 10.0, top: 10.0),
-                    width: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "DEC\n25",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 5.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Islamic Seminar",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
-                  child: Text(
-                    "\500 BDT",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xff6351ec),
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Icon(Icons.location_on),
-                Text(
-                  "Rose View Hotel, Uposhohor",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
