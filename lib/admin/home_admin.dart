@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'upload_event.dart';
 import 'update_event.dart';
+import 'delete_event.dart';
 
 class AdminHome extends StatelessWidget {
   const AdminHome({super.key});
@@ -42,6 +43,20 @@ class AdminHome extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const UpdateEvent()),
+                );
+              },
+            ),
+
+            const SizedBox(height: 25),
+
+            _adminCard(
+              context,
+              icon: Icons.delete,
+              title: "Delete\nEvents",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DeleteEvent()),
                 );
               },
             ),
